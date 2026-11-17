@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Splitter" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <title>Percentage Distribution Calculator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(51, 65, 85, 0.6);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.7);
+      --input-border: #334155;
+      --input-focus: #38bdf8;
+      
+      --c1: #6366f1; /* Indigo */
+      --c2: #10b981; /* Emerald */
+      --c3: #f59e0b; /* Amber */
+      --c4: #ec4899; /* Pink */
+      
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --card-hover: rgba(241, 245, 249, 0.95);
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --input-focus: #0284c7;
+      --shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 36px 12px;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 4px 0 4px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--c1), var(--c4));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: white;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .btn-icon {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-icon:hover, .btn-icon:active {
+      background: var(--card-hover);
+      transform: scale(0.96);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Top Amount Section */
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .currency-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .currency-selector select {
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .amount-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .currency-symbol {
+      position: absolute;
+      left: 16px;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-muted);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .amount-input {
+      width: 100%;
+      height: 60px;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      border-radius: var(--radius-md);
+      padding: 0 48px 0 44px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      outline: none;
+      transition: all 0.2s;
+      letter-spacing: -0.02em;
+    }
+
+    /* Prevent mobile zoom on focus */
+    @media (max-width: 640px) {
+      .amount-input {
+        font-size: 26px;
+      }
+    }
+
+    .amount-input:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .clear-btn:active {
+      background: var(--card-hover);
+    }
+
+    /* Quick Chips */
+    .quick-chips-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .quick-chips-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .quick-chips {
+      display: flex;
+      gap: 6px;
+      min-width: max-content;
+    }
+
+    .chip {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .chip:active {
+      background: var(--card-hover);
+      color: var(--text);
+      transform: scale(0.95);
+    }
+
+    /* Distribution Progress Bar */
+    .progress-bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .progress-bar {
+      height: 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      overflow: hidden;
+    }
+
+    .progress-segment {
+      height: 100%;
+      transition: width 0.25s ease-out;
+    }
+
+    .seg-1 { background: var(--c1); }
+    .seg-2 { background: var(--c2); }
+    .seg-3 { background: var(--c3); }
+    .seg-4 { background: var(--c4); }
+
+    /* Allocation Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-ok {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+    }
+
+    .badge-warn {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    /* Presets & Default Controls Bar */
+    .presets-scroll {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .preset-btn:active {
+      background: var(--card-hover);
+      color: var(--text);
+      transform: scale(0.96);
+    }
+
+    .btn-saved-default {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border-color: rgba(99, 102, 241, 0.35);
+      font-weight: 700;
+    }
+
+    .btn-save-action {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.35);
+      font-weight: 700;
+    }
+
+    /* Default Management Card */
+    .default-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px dashed rgba(99, 102, 241, 0.4);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .default-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+    }
+
+    .default-banner-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-mini {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-mini:active {
+      transform: scale(0.95);
+    }
+
+    /* 4 Distribution Rows */
+    .rows-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Mobile First Row Card Design */
+    .row-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .row-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .row-card.row-1::before { background: var(--c1); }
+    .row-card.row-2::before { background: var(--c2); }
+    .row-card.row-3::before { background: var(--c3); }
+    .row-card.row-4::before { background: var(--c4); }
+
+    /* Upper Half of Row: Name and Big Amount */
+    .row-top-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .row-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .row-1 .color-dot { background: var(--c1); }
+    .row-2 .color-dot { background: var(--c2); }
+    .row-3 .color-dot { background: var(--c3); }
+    .row-4 .color-dot { background: var(--c4); }
+
+    .row-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 3px 6px;
+      width: 100%;
+      outline: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .row-title:focus {
+      background: var(--input-bg);
+      border-color: var(--input-border);
+    }
+
+    .row-amount-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .amount-value {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .row-1 .amount-value { color: var(--c1); }
+    .row-2 .amount-value { color: var(--c2); }
+    .row-3 .amount-value { color: var(--c3); }
+    .row-4 .amount-value { color: var(--c4); }
+
+    .copy-icon-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+
+    .copy-icon-btn:active {
+      transform: scale(0.92);
+      background: var(--card-hover);
+    }
+
+    .copy-icon-btn.copied {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    /* Lower Half of Row: Slider & Direct % Input */
+    .row-controls-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .slider-track-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .pct-slider {
+      width: 100%;
+      height: 8px; /* Ticker for easy touch dragging on mobile */
+      border-radius: 4px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--input-border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Touch-friendly larger thumb */
+    .pct-slider::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      border: 2px solid white;
+    }
+
+    .row-1 .pct-slider::-webkit-slider-thumb { background: var(--c1); }
+    .row-2 .pct-slider::-webkit-slider-thumb { background: var(--c2); }
+    .row-3 .pct-slider::-webkit-slider-thumb { background: var(--c3); }
+    .row-4 .pct-slider::-webkit-slider-thumb { background: var(--c4); }
+
+    .pct-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+    .row-1 .pct-slider::-moz-range-thumb { background: var(--c1); }
+    .row-2 .pct-slider::-moz-range-thumb { background: var(--c2); }
+    .row-3 .pct-slider::-moz-range-thumb { background: var(--c3); }
+    .row-4 .pct-slider::-moz-range-thumb { background: var(--c4); }
+
+    .pct-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .pct-input {
+      width: 62px;
+      height: 34px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px; /* >= 16px or 15px for comfortable mobile input */
+      padding: 0 6px;
+      border-radius: 6px;
+      text-align: right;
+      outline: none;
+    }
+
+    .pct-input:focus {
+      border-color: var(--input-focus);
+    }
+
+    .pct-symbol {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* Footer Tools */
+    .footer-tools {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 4px 2px;
+    }
+
+    .btn-secondary {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:active {
+      background: var(--card-hover);
+      transform: scale(0.96);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-title">
+        <div class="logo-badge">%</div>
+        <div>
+          <h1>Percentage Splitter</h1>
+          <div class="subtitle">Live 4-way distribution with custom default memory</div>
+        </div>
+      </div>
+      <div class="header-actions" style="display: flex; gap: 8px; align-items: center;">
+        <button id="pwaInstallBtn" class="btn-secondary" style="display: none; background: rgba(99, 102, 241, 0.2); color: #818cf8; border-color: rgba(99, 102, 241, 0.4); padding: 8px 12px; font-weight: 700;">
+          📲 Install App
+        </button>
+        <button id="themeToggle" class="btn-icon" title="Toggle Light/Dark Theme">🌙</button>
+      </div>
+    </header>
+
+    <!-- Top Amount Card -->
+    <div class="card top-section">
+      <div class="label-row">
+        <span>Total Amount</span>
+        <div class="currency-selector">
+          <label for="currencySelect">Currency:</label>
+          <select id="currencySelect">
+            <option value="$">$ (USD)</option>
+            <option value="₹">₹ (INR)</option>
+            <option value="€">€ (EUR)</option>
+            <option value="£">£ (GBP)</option>
+            <option value="¥">¥ (JPY)</option>
+            <option value="">None</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="amount-input-wrapper">
+        <span class="currency-symbol" id="curSymbol">$</span>
+        <input
+          type="text"
+          id="totalAmountInput"
+          class="amount-input"
+          placeholder="0.00"
+          value="10,000"
+          inputmode="decimal"
+          autocomplete="off"
+        />
+        <button id="clearAmountBtn" class="clear-btn" title="Clear">✕</button>
+      </div>
+
+      <!-- Quick Amount Chips (Horizontally scrollable on mobile) -->
+      <div class="quick-chips-wrapper">
+        <div class="quick-chips">
+          <button class="chip" data-set="1000">1,000</button>
+          <button class="chip" data-set="5000">5,000</button>
+          <button class="chip" data-set="10000">10,000</button>
+          <button class="chip" data-set="50000">50,000</button>
+          <button class="chip" data-set="100000">100,000</button>
+          <button class="chip" data-add="1000">+1,000</button>
+          <button class="chip" data-add="5000">+5,000</button>
+        </div>
+      </div>
+
+      <!-- Distribution Stacked Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div id="bar1" class="progress-segment seg-1" style="width: 25%"></div>
+          <div id="bar2" class="progress-segment seg-2" style="width: 25%"></div>
+          <div id="bar3" class="progress-segment seg-3" style="width: 25%"></div>
+          <div id="bar4" class="progress-segment seg-4" style="width: 25%"></div>
+        </div>
+      </div>
+
+      <!-- Allocation Status & Quick Presets -->
+      <div class="status-bar">
+        <div id="allocationBadge" class="badge badge-ok">
+          <span id="badgeIcon">✓</span>
+          <span id="badgeText">Total: 100.0% allocated</span>
+        </div>
+
+        <div class="presets-scroll">
+          <button class="preset-btn btn-saved-default" id="loadDefaultBtn" title="Load your saved default distribution">
+            ⭐ My Default
+          </button>
+          <button class="preset-btn" id="presetEqual">25/25/25/25</button>
+          <button class="preset-btn" id="presetBudget">50/30/10/10</button>
+          <button class="preset-btn" id="autoBalanceBtn" style="color: var(--input-focus);">⚡ Balance</button>
+        </div>
+      </div>
+
+      <!-- Default Memory Banner -->
+      <div class="default-banner">
+        <div class="default-banner-left">
+          <span>💾</span>
+          <span id="defaultSummaryText">Default: 25% | 25% | 25% | 25%</span>
+        </div>
+        <div class="default-banner-actions">
+          <button id="saveAsDefaultBtn" class="btn-mini btn-save-action" title="Set current percentages & names as your permanent default">
+            💾 Save As Default
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Distribution Rows -->
+    <div class="rows-container">
+      <!-- Row 1 -->
+      <div class="row-card row-1">
+        <div class="row-top-line">
+          <div class="row-title-wrap">
+            <span class="color-dot"></span>
+            <input type="text" class="row-title" id="name1" value="Category 1" placeholder="Category name" />
+          </div>
+          <div class="row-amount-right">
+            <div class="amount-value" id="val1">$2,500.00</div>
+            <button class="copy-icon-btn" data-copy="1" title="Copy amount">📋</button>
+          </div>
+        </div>
+        <div class="row-controls-line">
+          <div class="slider-track-wrap">
+            <input type="range" min="0" max="100" step="0.5" class="pct-slider" id="slider1" value="25" />
+          </div>
+          <div class="pct-input-wrap">
+            <input type="number" step="0.1" min="0" max="100" class="pct-input" id="pct1" value="25" inputmode="decimal" />
+            <span class="pct-symbol">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="row-card row-2">
+        <div class="row-top-line">
+          <div class="row-title-wrap">
+            <span class="color-dot"></span>
+            <input type="text" class="row-title" id="name2" value="Category 2" placeholder="Category name" />
+          </div>
+          <div class="row-amount-right">
+            <div class="amount-value" id="val2">$2,500.00</div>
+            <button class="copy-icon-btn" data-copy="2" title="Copy amount">📋</button>
+          </div>
+        </div>
+        <div class="row-controls-line">
+          <div class="slider-track-wrap">
+            <input type="range" min="0" max="100" step="0.5" class="pct-slider" id="slider2" value="25" />
+          </div>
+          <div class="pct-input-wrap">
+            <input type="number" step="0.1" min="0" max="100" class="pct-input" id="pct2" value="25" inputmode="decimal" />
+            <span class="pct-symbol">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="row-card row-3">
+        <div class="row-top-line">
+          <div class="row-title-wrap">
+            <span class="color-dot"></span>
+            <input type="text" class="row-title" id="name3" value="Category 3" placeholder="Category name" />
+          </div>
+          <div class="row-amount-right">
+            <div class="amount-value" id="val3">$2,500.00</div>
+            <button class="copy-icon-btn" data-copy="3" title="Copy amount">📋</button>
+          </div>
+        </div>
+        <div class="row-controls-line">
+          <div class="slider-track-wrap">
+            <input type="range" min="0" max="100" step="0.5" class="pct-slider" id="slider3" value="25" />
+          </div>
+          <div class="pct-input-wrap">
+            <input type="number" step="0.1" min="0" max="100" class="pct-input" id="pct3" value="25" inputmode="decimal" />
+            <span class="pct-symbol">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="row-card row-4">
+        <div class="row-top-line">
+          <div class="row-title-wrap">
+            <span class="color-dot"></span>
+            <input type="text" class="row-title" id="name4" value="Category 4" placeholder="Category name" />
+          </div>
+          <div class="row-amount-right">
+            <div class="amount-value" id="val4">$2,500.00</div>
+            <button class="copy-icon-btn" data-copy="4" title="Copy amount">📋</button>
+          </div>
+        </div>
+        <div class="row-controls-line">
+          <div class="slider-track-wrap">
+            <input type="range" min="0" max="100" step="0.5" class="pct-slider" id="slider4" value="25" />
+          </div>
+          <div class="pct-input-wrap">
+            <input type="number" step="0.1" min="0" max="100" class="pct-input" id="pct4" value="25" inputmode="decimal" />
+            <span class="pct-symbol">%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Tools -->
+    <div class="footer-tools">
+      <div style="font-size: 12px; color: var(--text-muted)">
+        💡 Touch sliders or type exact % directly.
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="copySummaryBtn" class="btn-secondary">📋 Summary</button>
+        <button id="exportCsvBtn" class="btn-secondary">📥 CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Notification</div>
+
+  <script>
+    // State Structure
+    const defaultFactory = [
+      { name: "Category 1", pct: 25 },
+      { name: "Category 2", pct: 25 },
+      { name: "Category 3", pct: 25 },
+      { name: "Category 4", pct: 25 }
+    ];
+
+    const state = {
+      currency: "$",
+      totalAmount: 10000,
+      rows: JSON.parse(JSON.stringify(defaultFactory)),
+      savedDefault: JSON.parse(JSON.stringify(defaultFactory)),
+      theme: "dark"
+    };
+
+    // Load persisted state & saved default
+    try {
+      const savedDef = localStorage.getItem("pct_user_default_distribution");
+      if (savedDef) {
+        state.savedDefault = JSON.parse(savedDef);
+      }
+
+      const savedData = localStorage.getItem("pct_distributor_data");
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        if (parsed.currency !== undefined) state.currency = parsed.currency;
+        if (parsed.totalAmount !== undefined) state.totalAmount = parsed.totalAmount;
+        if (Array.isArray(parsed.rows) && parsed.rows.length === 4) {
+          state.rows = parsed.rows;
+        } else if (state.savedDefault) {
+          state.rows = JSON.parse(JSON.stringify(state.savedDefault));
+        }
+        if (parsed.theme) state.theme = parsed.theme;
+      } else if (state.savedDefault) {
+        state.rows = JSON.parse(JSON.stringify(state.savedDefault));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    // DOM Elements
+    const totalInput = document.getElementById("totalAmountInput");
+    const curSymbol = document.getElementById("curSymbol");
+    const currencySelect = document.getElementById("currencySelect");
+    const clearBtn = document.getElementById("clearAmountBtn");
+    const themeToggle = document.getElementById("themeToggle");
+    const allocationBadge = document.getElementById("allocationBadge");
+    const badgeText = document.getElementById("badgeText");
+    const badgeIcon = document.getElementById("badgeIcon");
+    const toast = document.getElementById("toast");
+    const defaultSummaryText = document.getElementById("defaultSummaryText");
+
+    // Theme Toggle
+    function applyTheme(theme) {
+      state.theme = theme;
+      document.documentElement.setAttribute("data-theme", theme);
+      themeToggle.textContent = theme === "dark" ? "🌙" : "☀️";
+      saveState();
+    }
+
+    themeToggle.addEventListener("click", () => {
+      applyTheme(state.theme === "dark" ? "light" : "dark");
+    });
+
+    // Formatting
+    function parseFormattedNumber(val) {
+      if (typeof val === "number") return isNaN(val) ? 0 : val;
+      if (!val) return 0;
+      const clean = val.toString().replace(/[^0-9.-]/g, "");
+      const num = parseFloat(clean);
+      return isNaN(num) ? 0 : num;
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatCurrency(num) {
+      if (!state.currency) return formatNumber(num);
+      return state.currency + formatNumber(num);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("pct_distributor_data", JSON.stringify({
+          currency: state.currency,
+          totalAmount: state.totalAmount,
+          rows: state.rows,
+          theme: state.theme
+        }));
+      } catch (e) {}
+    }
+
+    // Toast
+    let toastTimeout;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function updateDefaultBanner() {
+      if (state.savedDefault && Array.isArray(state.savedDefault)) {
+        const pcts = state.savedDefault.map(r => `${r.pct}%`).join(" | ");
+        defaultSummaryText.textContent = `Default: ${pcts}`;
+      }
+    }
+
+    // Save as Default Feature
+    document.getElementById("saveAsDefaultBtn").addEventListener("click", () => {
+      state.savedDefault = JSON.parse(JSON.stringify(state.rows));
+      try {
+        localStorage.setItem("pct_user_default_distribution", JSON.stringify(state.savedDefault));
+        updateDefaultBanner();
+        showToast("✓ Saved! This distribution will be your starting default.");
+      } catch (e) {
+        showToast("Error saving default");
+      }
+    });
+
+    // Load Default
+    document.getElementById("loadDefaultBtn").addEventListener("click", () => {
+      if (state.savedDefault && Array.isArray(state.savedDefault)) {
+        state.rows = JSON.parse(JSON.stringify(state.savedDefault));
+        updateUI();
+        showToast("Loaded your saved default distribution!");
+      }
+    });
+
+    // Update UI
+    function updateUI() {
+      curSymbol.textContent = state.currency || "";
+      if (currencySelect.value !== state.currency) {
+        currencySelect.value = state.currency;
+      }
+
+      clearBtn.style.display = totalInput.value.length > 0 ? "flex" : "none";
+
+      const total = state.totalAmount;
+      let sumPct = 0;
+
+      state.rows.forEach((row, idx) => {
+        const i = idx + 1;
+        const pct = Math.max(0, row.pct);
+        sumPct += pct;
+
+        const amount = (total * pct) / 100;
+
+        const nameInput = document.getElementById(`name${i}`);
+        const pctInput = document.getElementById(`pct${i}`);
+        const slider = document.getElementById(`slider${i}`);
+        const valDisplay = document.getElementById(`val${i}`);
+        const barSeg = document.getElementById(`bar${i}`);
+
+        if (document.activeElement !== nameInput) nameInput.value = row.name;
+        if (document.activeElement !== pctInput) pctInput.value = pct;
+        slider.value = pct;
+
+        valDisplay.textContent = formatCurrency(amount);
+        barSeg.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+      });
+
+      // Update badge
+      const roundedSum = Math.round(sumPct * 10) / 10;
+      if (Math.abs(roundedSum - 100) < 0.05) {
+        allocationBadge.className = "badge badge-ok";
+        badgeIcon.textContent = "✓";
+        badgeText.textContent = `Total: ${roundedSum.toFixed(1)}% allocated`;
+      } else if (roundedSum < 100) {
+        const rem = (100 - roundedSum).toFixed(1);
+        allocationBadge.className = "badge badge-warn";
+        badgeIcon.textContent = "⚠";
+        badgeText.textContent = `Total: ${roundedSum.toFixed(1)}% (${rem}% unallocated)`;
+      } else {
+        const excess = (roundedSum - 100).toFixed(1);
+        allocationBadge.className = "badge badge-danger";
+        badgeIcon.textContent = "✕";
+        badgeText.textContent = `Total: ${roundedSum.toFixed(1)}% (+${excess}% over)`;
+      }
+
+      updateDefaultBanner();
+      saveState();
+    }
+
+    // Input Events
+    totalInput.addEventListener("input", (e) => {
+      state.totalAmount = parseFormattedNumber(e.target.value);
+      updateUI();
+    });
+
+    totalInput.addEventListener("blur", () => {
+      totalInput.value = formatNumber(state.totalAmount);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      state.totalAmount = 0;
+      totalInput.value = "";
+      totalInput.focus();
+      updateUI();
+    });
+
+    currencySelect.addEventListener("change", (e) => {
+      state.currency = e.target.value;
+      updateUI();
+    });
+
+    // Quick Chips
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (chip.dataset.set) {
+          state.totalAmount = parseFloat(chip.dataset.set);
+        } else if (chip.dataset.add) {
+          state.totalAmount += parseFloat(chip.dataset.add);
+        }
+        totalInput.value = formatNumber(state.totalAmount);
+        updateUI();
+      });
+    });
+
+    // Row Event Listeners
+    [1, 2, 3, 4].forEach((i) => {
+      const idx = i - 1;
+      const nameInput = document.getElementById(`name${i}`);
+      const pctInput = document.getElementById(`pct${i}`);
+      const slider = document.getElementById(`slider${i}`);
+
+      nameInput.addEventListener("input", (e) => {
+        state.rows[idx].name = e.target.value;
+        saveState();
+      });
+
+      pctInput.addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value) || 0;
+        state.rows[idx].pct = Math.max(0, val);
+        updateUI();
+      });
+
+      slider.addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value) || 0;
+        state.rows[idx].pct = val;
+        updateUI();
+      });
+    });
+
+    // Presets
+    document.getElementById("presetEqual").addEventListener("click", () => {
+      state.rows.forEach((r) => (r.pct = 25));
+      updateUI();
+    });
+
+    document.getElementById("presetBudget").addEventListener("click", () => {
+      state.rows[0].pct = 50;
+      state.rows[1].pct = 30;
+      state.rows[2].pct = 10;
+      state.rows[3].pct = 10;
+      updateUI();
+    });
+
+    document.getElementById("autoBalanceBtn").addEventListener("click", () => {
+      const sumFirst3 = state.rows[0].pct + state.rows[1].pct + state.rows[2].pct;
+      const remainder = Math.max(0, 100 - sumFirst3);
+      state.rows[3].pct = Math.round(remainder * 10) / 10;
+      updateUI();
+      showToast(`Balanced row 4 to ${state.rows[3].pct}%`);
+    });
+
+    // Copy single row amount
+    document.querySelectorAll(".copy-icon-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const i = parseInt(btn.dataset.copy, 10);
+        const idx = i - 1;
+        const row = state.rows[idx];
+        const amount = (state.totalAmount * row.pct) / 100;
+        const formatted = formatCurrency(amount);
+
+        navigator.clipboard.writeText(formatted).then(() => {
+          btn.classList.add("copied");
+          btn.textContent = "✓";
+          showToast(`Copied ${row.name}: ${formatted}`);
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.textContent = "📋";
+          }, 1500);
+        });
+      });
+    });
+
+    // Copy Summary Breakdown
+    document.getElementById("copySummaryBtn").addEventListener("click", () => {
+      const totalStr = formatCurrency(state.totalAmount);
+      let text = `Total Amount: ${totalStr}\n`;
+      text += `------------------------------------\n`;
+      state.rows.forEach((r) => {
+        const amt = (state.totalAmount * r.pct) / 100;
+        text += `${r.name.padEnd(16)} | ${r.pct.toFixed(1)}% | ${formatCurrency(amt)}\n`;
+      });
+      text += `------------------------------------`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Full summary copied to clipboard!");
+      });
+    });
+
+    // Export to CSV
+    document.getElementById("exportCsvBtn").addEventListener("click", () => {
+      let csv = "Category,Percentage (%),Amount (" + (state.currency || "Units") + ")\n";
+      state.rows.forEach((r) => {
+        const amt = ((state.totalAmount * r.pct) / 100).toFixed(2);
+        csv += `"${r.name.replace(/"/g, '""')}",${r.pct.toFixed(2)},${amt}\n`;
+      });
+      csv += `"Total",100.00,${state.totalAmount.toFixed(2)}\n`;
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "percentage_distribution.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("CSV file downloaded!");
+    });
+
+    // Initial setup
+    totalInput.value = formatNumber(state.totalAmount);
+    applyTheme(state.theme || "dark");
+    updateUI();
+
+    // PWA & Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
+      });
+    }
+
+    // Native Install Prompt
+    let deferredPrompt;
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      pwaInstallBtn.style.display = 'inline-flex';
+    });
+
+    pwaInstallBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          showToast('✓ Installing App...');
+        }
+        deferredPrompt = null;
+        pwaInstallBtn.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      pwaInstallBtn.style.display = 'none';
+      showToast('🎉 App successfully installed!');
+    });
+  </script>
+</body>
+</html>
