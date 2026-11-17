@@ -1,0 +1,18 @@
+{
+  "name": "Percentage Distribution Calculator",
+  "short_name": "Splitter",
+  "description": "Split any amount across 4 rows with customizable percentages",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
